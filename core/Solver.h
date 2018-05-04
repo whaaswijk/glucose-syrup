@@ -235,8 +235,8 @@ public:
     // Certified UNSAT ( Thanks to Marijn Heule
     // New in 2016 : proof in DRAT format, possibility to use binary output
     FILE*               certifiedOutput;
-    bool                certifiedUNSAT;
-    bool                vbyte;
+    bool                certifiedUNSAT = false;
+    bool                vbyte = false;
 
     void write_char (unsigned char c);
     void write_lit (int n);

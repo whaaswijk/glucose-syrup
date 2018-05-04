@@ -120,6 +120,11 @@ MultiSolvers::MultiSolvers(ParallelSolver *s) :
         fprintf(stdout, "c %d solvers engines and 1 companion as a blackboard created.\n", nbsolvers);
 }
 
+MultiSolvers::MultiSolvers(int nr_threads) : MultiSolvers(new ParallelSolver(-1)) {
+    nbthreads = nr_threads;
+    nbsolvers = nr_threads;
+    maxnbsolvers = nr_threads;
+}
 
 MultiSolvers::MultiSolvers() : MultiSolvers(new ParallelSolver(-1)) {
 
@@ -622,8 +627,6 @@ lbool MultiSolvers::solve() {
     pthread_attr_init(&thAttr);
     pthread_attr_setdetachstate(&thAttr, PTHREAD_CREATE_JOINABLE);
 
-
-
     // Launching all solvers
     for(i = 0; i < nbsolvers; i++) {
         pthread_t *pt = (pthread_t *) malloc(sizeof(pthread_t));
@@ -637,15 +640,25 @@ lbool MultiSolvers::solve() {
     bool adjustedlimitonce = false;
 
     (void) pthread_mutex_lock(&m);
+    (void) pthread_mutex_lock(&mfinished);
     while(!done) {
         struct timespec timeout;
         time(&timeout.tv_sec);
         timeout.tv_sec += MAXIMUM_SLEEP_DURATION;
         timeout.tv_nsec = 0;
-        if(pthread_cond_timedwait(&cfinished, &mfinished, &timeout) != ETIMEDOUT)
+        //if(pthread_cond_timedwait(&cfinished, &mfinished, &timeout) != ETIMEDOUT) {
+
+        // NOTE: some of the threads may have already finished at this point!
+        done = (sharedcomp->jobStatus != l_Undef);
+        if(done) {
+            break;
+        }
+
+        if (pthread_cond_wait(&cfinished, &mfinished) != ETIMEDOUT) {
             done = true;
-        else
-            printStats();
+        } else {
+            //printStats();
+        }
 
         float mem = memUsed();
         if(verb >= 1) printf("c Total Memory so far : %.2fMb\n", mem);
@@ -671,6 +684,7 @@ lbool MultiSolvers::solve() {
     }
 
     (void) pthread_mutex_unlock(&m);
+    (void) pthread_mutex_unlock(&mfinished);
 
     for(i = 0; i < nbsolvers; i++) { // Wait for all threads to finish
         pthread_join(*threads[i], NULL);

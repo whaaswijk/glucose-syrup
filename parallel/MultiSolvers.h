@@ -61,6 +61,7 @@ class MultiSolvers {
 public:
   MultiSolvers(ParallelSolver *s);
   MultiSolvers();
+  MultiSolvers(int nr_threads);
   ~MultiSolvers();
  
   void printFinalStats(); 

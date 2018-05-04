@@ -457,7 +457,9 @@ lbool ParallelSolver::solve_(bool do_simp, bool turn_off_simp) {
 
     model.clear();
     conflict.clear();
-    if (!ok) return l_False;
+    if (!ok) { 
+        return l_False;
+    }
 
     solves++;
 
@@ -486,7 +488,7 @@ lbool ParallelSolver::solve_(bool do_simp, bool turn_off_simp) {
     if (status != l_Undef)
         firstToFinish = sharedcomp->IFinished(this);
     if (firstToFinish) {
-        printf("c Thread %d is 100%% pure glucose! First thread to finish! (%s answer).\n", threadNumber(), status == l_True ? "SAT" : status == l_False ? "UNSAT" : "UNKOWN");
+        //printf("c Thread %d is 100%% pure glucose! First thread to finish! (%s answer).\n", threadNumber(), status == l_True ? "SAT" : status == l_False ? "UNSAT" : "UNKOWN");
         sharedcomp->jobStatus = status;
     }
     
@@ -504,7 +506,6 @@ lbool ParallelSolver::solve_(bool do_simp, bool turn_off_simp) {
     pthread_cond_signal(pcfinished);
 
     //cancelUntil(0);
-
 
     return status;
 
