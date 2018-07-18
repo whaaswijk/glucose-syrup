@@ -6,6 +6,11 @@ file(GLOB util_srcs utils/*.cc)
 list(FILTER simp_srcs EXCLUDE REGEX ".*Main.cc$")
 list(FILTER parr_srcs EXCLUDE REGEX ".*Main.cc$")
 
+# Surpress warnings in external library
+if (UNIX)
+    set(CMAKE_CXX_FLAGS "-w")
+endif()
+
 add_library(syrup ${core_srcs} ${simp_srcs} ${parr_srcs} ${util_srcs})
 
 target_include_directories(syrup PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
