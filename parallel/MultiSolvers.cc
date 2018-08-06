@@ -121,7 +121,7 @@ MultiSolvers::MultiSolvers(ParallelSolver *s) :
 }
 
 MultiSolvers::MultiSolvers(int nr_threads) :
-        use_simplification(true), ok(true), maxnbthreads(4), nbthreads(nr_threads), nbsolvers(nt_threads), nbcompanions(4), nbcompbysolver(2),
+        use_simplification(true), ok(true), maxnbthreads(4), nbthreads(nr_threads), nbsolvers(nr_threads), nbcompanions(4), nbcompbysolver(2),
         allClonesAreBuilt(0), showModel(false), winner(-1), var_decay(1 / 0.95), clause_decay(1 / 0.999), cla_inc(1), var_inc(1), random_var_freq(0.02), restart_first(100),
         restart_inc(1.5), learntsize_factor((double) 1 / (double) 3), learntsize_inc(1.1), expensive_ccmin(true), polarity_mode(polarity_false), maxmemory(opt_maxmemory),
         maxnbsolvers(opt_maxnbsolvers), verb(0), verbEveryConflicts(10000), numvar(0), numclauses(0) {
