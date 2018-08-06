@@ -120,10 +120,33 @@ MultiSolvers::MultiSolvers(ParallelSolver *s) :
         fprintf(stdout, "c %d solvers engines and 1 companion as a blackboard created.\n", nbsolvers);
 }
 
-MultiSolvers::MultiSolvers(int nr_threads) : MultiSolvers(new ParallelSolver(-1)) {
-    nbthreads = nr_threads;
-    nbsolvers = nr_threads;
-    maxnbsolvers = nr_threads;
+MultiSolvers::MultiSolvers(int nr_threads) :
+        use_simplification(true), ok(true), maxnbthreads(4), nbthreads(nr_threads), nbsolvers(nr_threads), nbcompanions(4), nbcompbysolver(2),
+        allClonesAreBuilt(0), showModel(false), winner(-1), var_decay(1 / 0.95), clause_decay(1 / 0.999), cla_inc(1), var_inc(1), random_var_freq(0.02), restart_first(100),
+        restart_inc(1.5), learntsize_factor((double) 1 / (double) 3), learntsize_inc(1.1), expensive_ccmin(true), polarity_mode(polarity_false), maxmemory(opt_maxmemory),
+        maxnbsolvers(opt_maxnbsolvers), verb(0), verbEveryConflicts(10000), numvar(0), numclauses(0) {
+    auto s = new ParallelSolver(-1);
+    result = l_Undef;
+    SharedCompanion *sc = new SharedCompanion();
+    this->sharedcomp = sc;
+
+    // Generate only solver 0.
+    // It loads the formula
+    // All others solvers are clone of this one
+    solvers.push(s);
+    s->verbosity = 0; // No reportf in solvers... All is done in MultiSolver
+    s->setThreadNumber(0);
+    //s->belongsto = this;
+    s->sharedcomp = sc;
+    sc->addSolver(s);
+    assert(solvers[0]->threadNumber() == 0);
+
+    pthread_mutex_init(&m, NULL);  //PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_init(&mfinished, NULL); //PTHREAD_MUTEX_INITIALIZER;
+    pthread_cond_init(&cfinished, NULL);
+
+    if(nbsolvers > 0)
+        fprintf(stdout, "c %d solvers engines and 1 companion as a blackboard created.\n", nbsolvers);
 }
 
 MultiSolvers::MultiSolvers() : MultiSolvers(new ParallelSolver(-1)) {
