@@ -115,9 +115,6 @@ MultiSolvers::MultiSolvers(ParallelSolver *s) :
     pthread_mutex_init(&m, NULL);  //PTHREAD_MUTEX_INITIALIZER;
     pthread_mutex_init(&mfinished, NULL); //PTHREAD_MUTEX_INITIALIZER;
     pthread_cond_init(&cfinished, NULL);
-
-    if(nbsolvers > 0)
-        fprintf(stdout, "c %d solvers engines and 1 companion as a blackboard created.\n", nbsolvers);
 }
 
 MultiSolvers::MultiSolvers(int nr_threads) :
@@ -145,8 +142,6 @@ MultiSolvers::MultiSolvers(int nr_threads) :
     pthread_mutex_init(&mfinished, NULL); //PTHREAD_MUTEX_INITIALIZER;
     pthread_cond_init(&cfinished, NULL);
 
-    if(nbsolvers > 0)
-        fprintf(stdout, "c %d solvers engines and 1 companion as a blackboard created.\n", nbsolvers);
 }
 
 MultiSolvers::MultiSolvers() : MultiSolvers(new ParallelSolver(-1)) {
